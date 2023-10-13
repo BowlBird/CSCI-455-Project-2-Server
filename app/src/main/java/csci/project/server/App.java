@@ -3,12 +3,18 @@
  */
 package csci.project.server;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+public class App {
+    public static void main(String[] args) throws IOException {
+        ServerSocket serverSocket = new ServerSocket(50000);
+
+        while (true) {
+            Socket connection = serverSocket.accept();
+            System.out.println("Connected");
+            new Thread(new ClientHandler(connection)).start();
+        }
     }
 }
