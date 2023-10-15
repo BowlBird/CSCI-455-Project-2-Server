@@ -9,12 +9,14 @@ import java.net.Socket;
 
 public class App {
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(50000);
-
-        while (true) {
-            Socket connection = serverSocket.accept();
-            System.out.println("Connected");
-            new Thread(new ClientHandler(connection)).start();
-        }
+        Database db = new Database();
+        db.test();
+//        ServerSocket serverSocket = new ServerSocket(50000);
+//
+//        while (true) {
+//            Socket connection = serverSocket.accept();
+//            System.out.println("Connected");
+//            new Thread(new ClientHandler(connection)).start();
+//        }
     }
 }
