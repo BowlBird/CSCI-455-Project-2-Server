@@ -1,5 +1,7 @@
 package csci.project.server;
 
+import java.util.Date;
+
 public class RequestHandler {
 
     public static RequestObject handle(RequestObject request, Database dbcon) {
@@ -30,7 +32,9 @@ public class RequestHandler {
         response.put("response", "LIST");
         Event[] events = dbcon.getAllEvents();
         for (Event event : events) {
-            response.put("" + event.id(), event.toMessageString());
+            if (event.endDate().compareTo(new Date(System.currentTimeMillis())) > 0 == Boolean.parseBoolean(request.get("current"))) {
+                response.put("" + event.id(), event.toMessageString());
+            }
         }
         return response;
     }
