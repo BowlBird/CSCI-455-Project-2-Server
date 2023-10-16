@@ -3,7 +3,7 @@ package csci.project.server;
 import java.util.HashMap;
 
 public class RequestObject {
-    
+
     private final HashMap<String, String> pairs;
 
     public RequestObject() {
@@ -33,8 +33,13 @@ public class RequestObject {
     @Override
     public String toString() {
         String result = "";
+        if (pairs.keySet().contains("response")) {
+            result += String.format("response : %s\n", pairs.get("response"));
+        }
         for (String key : pairs.keySet()) {
-            result += String.format("%s : %s", key, pairs.get(key));
+            if (!key.equals("response")) {
+                result += String.format("%s : %s\n", key, pairs.get(key));
+            }
         }
         return result.strip();
     }
