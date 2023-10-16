@@ -51,10 +51,11 @@ public class Database {
             try {
                 String trimmed = str.substring(1, str.length() - 1).replaceAll("\"", "");
                 String[] parts = trimmed.split("(,|:)");
-                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(parts[1]);
-                double goal = Double.parseDouble(parts[3]);
-                String name = parts[5];
-                return Optional.ofNullable(new Event(id, name, goal, date));
+                double balance = Double.parseDouble(parts[1]);
+                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(parts[3]);
+                double goal = Double.parseDouble(parts[5]);
+                String name = parts[7];
+                return Optional.ofNullable(new Event(id, name, balance, goal, date));
             } catch (Exception e) {
                 return Optional.empty();
             }
@@ -82,15 +83,17 @@ public class Database {
         Function<String, Event[]> parseEvents = str -> {
             try {
                 String trimmed = str.replaceAll("([|]|\\{|\\}|\")", "");
+                System.out.println(trimmed);
                 String[] parts = trimmed.split("(,|:)");
-                Event[] result = new Event[parts.length / 7];
+                Event[] result = new Event[parts.length / 9];
                 for (int i = 0; i < result.length; i++) {
-                    int offset = i * 7;
+                    int offset = i * 9;
                     int id = Integer.parseInt(parts[offset].substring(1));
-                    Date date = new SimpleDateFormat("yyyy-MM-dd").parse(parts[offset + 2]);
-                    double goal = Double.parseDouble(parts[offset + 4]);
-                    String name = parts[offset + 6];
-                    result[i] = new Event(id, name, goal, date);
+                    double balance = Double.parseDouble(parts[offset + 2]);
+                    Date date = new SimpleDateFormat("yyyy-MM-dd").parse(parts[offset + 4]);
+                    double goal = Double.parseDouble(parts[offset + 6]);
+                    String name = parts[offset + 8];
+                    result[i] = new Event(id, name, goal, balance, date);
                 }
                 return result;
             } catch (Exception e) {
