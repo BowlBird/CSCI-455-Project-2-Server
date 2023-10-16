@@ -1,6 +1,7 @@
 package csci.project.server;
 
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.Date;
 import java.net.URI;
@@ -13,6 +14,7 @@ import java.text.SimpleDateFormat;
 
 public class Database {
 
+    private static final ReentrantLock lock = new ReentrantLock();
     private final HttpClient client;
     private int nextId;
 
@@ -26,10 +28,13 @@ public class Database {
                 .uri(buildURI("nextId"))
                 .GET()
                 .build();
-        return client.sendAsync(request, BodyHandlers.ofString())
+        lock.lock();
+        int result = client.sendAsync(request, BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenApply(Integer::parseInt)
                 .join();
+        lock.unlock();
+        return result;
     }
 
     public void putEvent(Event event) {
@@ -37,8 +42,10 @@ public class Database {
                 .uri(buildURI("events/_" + event.id()))
                 .PUT(BodyPublishers.ofString(event.toDatabaseString()))
                 .build();
+        lock.lock();
         client.sendAsync(request, BodyHandlers.ofString())
                 .join();
+        lock.unlock();
     }
 
     public int createEvent(PartialEvent partialEvent) {
@@ -68,7 +75,8 @@ public class Database {
             }
         };
 
-        return client.sendAsync(request, BodyHandlers.ofString())
+        lock.lock();
+        Optional<Event> result = client.sendAsync(request, BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenApply(body -> {
                     if (body.equals("null")) {
@@ -79,6 +87,8 @@ public class Database {
                 })
                 .thenApply(body -> body.flatMap(parseEvent))
                 .join();
+        lock.lock();
+        return result;
     }
 
     public Event[] getAllEvents() {
@@ -107,7 +117,8 @@ public class Database {
             }
         };
 
-        return client.sendAsync(request, BodyHandlers.ofString())
+        lock.lock();
+        Event[] result = client.sendAsync(request, BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenApply(body -> {
                     if (body.equals("null")) {
@@ -118,6 +129,8 @@ public class Database {
                 })
                 .thenApply(body -> body.map(parseEvents).orElse(new Event[0]))
                 .join();
+        lock.unlock();
+        return result;
     }
 
     private URI buildURI(String endpointId) {
