@@ -41,6 +41,11 @@ public class Database {
                 .join();
     }
 
+    public void createEvent(PartialEvent partialEvent) {
+        Event event = partialEvent.addId(nextId++);
+        putEvent(event);
+    }
+
     public Optional<Event> getEvent(int id) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(buildURI("events/_" + id))
@@ -83,7 +88,6 @@ public class Database {
         Function<String, Event[]> parseEvents = str -> {
             try {
                 String trimmed = str.replaceAll("([|]|\\{|\\}|\")", "");
-                System.out.println(trimmed);
                 String[] parts = trimmed.split("(,|:)");
                 Event[] result = new Event[parts.length / 9];
                 for (int i = 0; i < result.length; i++) {
@@ -97,7 +101,6 @@ public class Database {
                 }
                 return result;
             } catch (Exception e) {
-                System.out.println(e);
                 return new Event[0];
             }
         };
@@ -113,27 +116,6 @@ public class Database {
                 })
                 .thenApply(body -> body.map(parseEvents).orElse(new Event[0]))
                 .join();
-    }
-
-    public void test() throws Exception {
-        // HttpClient client = HttpClient.newHttpClient();
-        // HttpRequest request = HttpRequest.newBuilder()
-        // .uri(buildURI("asdf"))
-        // .PUT(BodyPublishers.ofString("\"Hello\""))
-        // .build();
-        // client.sendAsync(request, BodyHandlers.ofString())
-        // .thenApply(HttpResponse::body)
-        // .thenAccept(System.out::println)
-        // .join();
-
-        // request = HttpRequest.newBuilder()
-        // .uri(buildURI("message"))
-        // .DELETE()
-        // .build();
-        // client.sendAsync(request, BodyHandlers.ofString())
-        // .thenApply(HttpResponse::body)
-        // .thenAccept(System.out::println)
-        // .join();
     }
 
     private URI buildURI(String endpointId) {

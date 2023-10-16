@@ -36,8 +36,11 @@ public class RequestObject {
         if (pairs.keySet().contains("response")) {
             result += String.format("response : %s\n", pairs.get("response"));
         }
+        if (pairs.keySet().contains("current")) {
+            result += String.format("current : %s\n", pairs.get("current"));
+        }
         for (String key : pairs.keySet()) {
-            if (!key.equals("response")) {
+            if (!key.equals("response") && !key.equals("current")) {
                 result += String.format("%s : %s\n", key, pairs.get(key));
             }
         }

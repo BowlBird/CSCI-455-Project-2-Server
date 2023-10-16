@@ -1,6 +1,8 @@
 package csci.project.server;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 public class RequestHandler {
 
@@ -13,6 +15,12 @@ public class RequestHandler {
             case "LIST":
                 response = handleList(request, dbcon);
                 break;
+            case "CREATE":
+                response = handleCreate(request, dbcon);
+                break;
+            case "BALANCE":
+                response = handleBalance(request, dbcon);
+                break;
             default:
                 response = new RequestObject();
                 break;
@@ -21,21 +29,57 @@ public class RequestHandler {
     }
 
     private static RequestObject handleDonate(RequestObject request, Database dbcon) {
+        Optional<Event> event = dbcon.getEvent(request.getAsInt("id"));
         RequestObject response = new RequestObject();
         response.put("response", "DONATE");
-        response.put("data", "Hello from server API");
+        response.put("successful", false);
+        event.ifPresent(e -> {
+            dbcon.putEvent(
+                    new Event(e.id(), e.name(), e.goal(), e.balance() + request.getAsDouble("amount"), e.endDate()));
+            response.put("successful", true);
+        });
         return response;
     }
 
     private static RequestObject handleList(RequestObject request, Database dbcon) {
         RequestObject response = new RequestObject();
         response.put("response", "LIST");
+        response.put("current", request.get("current"));
         Event[] events = dbcon.getAllEvents();
         for (Event event : events) {
-            if (event.endDate().compareTo(new Date(System.currentTimeMillis())) > 0 == Boolean.parseBoolean(request.get("current"))) {
+            if (event.endDate().compareTo(new Date(System.currentTimeMillis())) > 0 == Boolean
+                    .parseBoolean(request.get("current"))) {
                 response.put("" + event.id(), event.toMessageString());
             }
         }
+        return response;
+    }
+
+    private static RequestObject handleCreate(RequestObject request, Database dbcon) {
+        RequestObject response = new RequestObject();
+        response.put("response", "CREATE");
+        response.put("successful", false);
+        try {
+            PartialEvent newEvent = new PartialEvent(
+                    request.get("name"),
+                    request.getAsDouble("targetAmount"),
+                    0.0,
+                    new SimpleDateFormat("yyyy-MM-dd").parse(request.get("deadline"))
+            );
+            dbcon.createEvent(newEvent);
+            response.put("successful", true);
+            return response;
+        } catch (Exception e) {
+            return response;
+        }
+    }
+
+    private static RequestObject handleBalance(RequestObject request, Database dbcon) {
+        RequestObject response = new RequestObject();
+        response.put("response", "BALANCE");
+        response.put("balance", 0.0);
+        Optional<Event> event = dbcon.getEvent(request.getAsInt("id"));
+        event.ifPresent(e -> response.put("balance", e.balance()));
         return response;
     }
 
