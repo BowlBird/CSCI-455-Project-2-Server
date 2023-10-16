@@ -8,15 +8,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class App {
-    public static void main(String[] args) throws IOException {
-        Database db = new Database();
-        db.test();
-//        ServerSocket serverSocket = new ServerSocket(50000);
-//
-//        while (true) {
-//            Socket connection = serverSocket.accept();
-//            System.out.println("Connected");
-//            new Thread(new ClientHandler(connection)).start();
-//        }
+    public static void main(String[] args) throws IOException, Exception {
+        ServerSocket serverSocket = new ServerSocket(50000);
+
+        while (true) {
+            Socket connection = serverSocket.accept();
+            System.out.println("Connected");
+            new Thread(new ClientHandler(connection)).start();
+        }
     }
 }

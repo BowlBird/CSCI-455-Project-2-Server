@@ -13,6 +13,7 @@ public class ClientHandler implements Runnable {
     private final ObjectInputStream inputStream;
     private final BooleanSupplier isConnected;
     private final Runnable closeConnection;
+    private final Database dbcon;
 
     public ClientHandler(Socket connection) throws IOException {
         this.outputStream = new ObjectOutputStream(connection.getOutputStream());
@@ -26,6 +27,7 @@ public class ClientHandler implements Runnable {
             } catch (Exception e) {
             }
         };
+        this.dbcon = new Database();
     }
 
     @Override
@@ -34,7 +36,7 @@ public class ClientHandler implements Runnable {
             while (this.isConnected.getAsBoolean()) {
                 RequestObject request = RequestParser.parse((String) inputStream.readObject());
                 System.out.printf("HEARD\n%s\n", request.toString());
-                RequestObject response = RequestHandler.handle(request);
+                RequestObject response = RequestHandler.handle(request, dbcon);
                 System.out.printf("SENDING\n%s\n", response.toString());
                 outputStream.writeObject(response.toString());
                 outputStream.flush();
