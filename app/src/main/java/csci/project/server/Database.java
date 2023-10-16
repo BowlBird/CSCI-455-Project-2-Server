@@ -41,9 +41,11 @@ public class Database {
                 .join();
     }
 
-    public void createEvent(PartialEvent partialEvent) {
-        Event event = partialEvent.addId(nextId++);
+    public int createEvent(PartialEvent partialEvent) {
+        int id = nextId++;
+        Event event = partialEvent.addId(id);
         putEvent(event);
+        return id;
     }
 
     public Optional<Event> getEvent(int id) {

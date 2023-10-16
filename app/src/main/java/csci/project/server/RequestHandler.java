@@ -58,7 +58,7 @@ public class RequestHandler {
     private static RequestObject handleCreate(RequestObject request, Database dbcon) {
         RequestObject response = new RequestObject();
         response.put("response", "CREATE");
-        response.put("successful", false);
+        response.put("id", -1);
         try {
             PartialEvent newEvent = new PartialEvent(
                     request.get("name"),
@@ -66,8 +66,8 @@ public class RequestHandler {
                     0.0,
                     new SimpleDateFormat("yyyy-MM-dd").parse(request.get("deadline"))
             );
-            dbcon.createEvent(newEvent);
-            response.put("successful", true);
+            int id = dbcon.createEvent(newEvent);
+            response.put("id", id);
             return response;
         } catch (Exception e) {
             return response;
