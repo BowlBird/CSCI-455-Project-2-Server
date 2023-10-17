@@ -72,7 +72,7 @@ public class Database {
                 Date date = new SimpleDateFormat("yyyy-MM-dd").parse(parts[3]);
                 double goal = Double.parseDouble(parts[5]);
                 String name = parts[7];
-                return Optional.ofNullable(new Event(id, name, balance, goal, date));
+                return Optional.ofNullable(new Event(id, name, goal, balance, date));
             } catch (Exception e) {
                 return Optional.empty();
             }
