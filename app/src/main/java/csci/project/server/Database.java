@@ -111,7 +111,7 @@ public class Database {
                 })
                 .thenApply(body -> body.flatMap(parseEvent))
                 .join();
-        lock.lock();
+        lock.unlock();
         return result;
     }
 
