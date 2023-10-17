@@ -17,10 +17,17 @@ public class Database {
     private static final ReentrantLock lock = new ReentrantLock();
     private final HttpClient client;
 
+    /**
+     * Handles the connection and requests to the database.
+     */
     public Database() {
         this.client = HttpClient.newHttpClient();
     }
 
+    /**
+     * Gets and increments nextId in the database
+     * @return The value of nextId in the database before incrementing
+     */
     private int getAndIncrementNextId() {
         HttpRequest getRequest = HttpRequest.newBuilder()
                 .uri(buildURI("nextId"))
@@ -40,6 +47,10 @@ public class Database {
         return id;
     }
 
+    /**
+     * Puts an event in the database. If an event with the same id already exists, it will be overwritten.
+     * @param event Event to put in the database
+     */
     public void putEvent(Event event) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(buildURI("events/_" + event.id()))
@@ -51,6 +62,11 @@ public class Database {
         lock.unlock();
     }
 
+    /**
+     * Creates a new event in the database. This will assign an auto-incrementing id
+     * @param partialEvent The new event to add to the database without an id
+     * @return The id of the new event
+     */
     public int createEvent(PartialEvent partialEvent) {
         int id = getAndIncrementNextId();
         Event event = partialEvent.addId(id);
@@ -58,6 +74,11 @@ public class Database {
         return id;
     }
 
+    /**
+     * Gets an event from the database if it exists
+     * @param id ID of the event to get
+     * @return The event with the given id if it exists
+     */
     public Optional<Event> getEvent(int id) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(buildURI("events/_" + id))
@@ -94,6 +115,10 @@ public class Database {
         return result;
     }
 
+    /**
+     * Gets the list of all events in the database
+     * @return Array containing all of the events in the database
+     */
     public Event[] getAllEvents() {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(buildURI("events"))
@@ -136,6 +161,11 @@ public class Database {
         return result;
     }
 
+    /**
+     * Builds the URI for the location of the requested resource in the database
+     * @param endpointId The requested resource path
+     * @return URI for the requested resource in the database
+     */
     private URI buildURI(String endpointId) {
         return URI.create(String.format("https://csci-455-project-1-default-rtdb.firebaseio.com/%s.json", endpointId));
     }

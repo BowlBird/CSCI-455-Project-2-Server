@@ -9,12 +9,12 @@ import java.net.Socket;
 
 public class App {
     public static void main(String[] args) throws IOException, Exception {
-        ServerSocket serverSocket = new ServerSocket(50000);
+        ServerSocket serverSocket = new ServerSocket(50000); // Open ServerSocket on port 50000
 
         while (true) {
             Socket connection = serverSocket.accept();
             System.out.println("Connected");
             new Thread(new ClientHandler(connection)).start();
-        }
+        } // Accept any new clients and start a ClientHandler on a new Thread
     }
 }

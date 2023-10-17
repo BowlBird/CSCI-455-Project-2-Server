@@ -6,6 +6,12 @@ import java.util.Optional;
 
 public class RequestHandler {
 
+    /**
+     * Handles a request from a client
+     * @param request Request from the client
+     * @param dbcon Database connection for the client
+     * @return Response to send to the client
+     */
     public static RequestObject handle(RequestObject request, Database dbcon) {
         RequestObject response;
         switch (request.get("endpoint")) {
@@ -25,6 +31,12 @@ public class RequestHandler {
         return response;
     }
 
+    /**
+     * Handles a DONATE request
+     * @param request Request from the client
+     * @param dbcon Database connection for the client
+     * @return Response to send to the client
+     */
     private static RequestObject handleDonate(RequestObject request, Database dbcon) {
         Optional<Event> event = dbcon.getEvent(request.getAsInt("id"));
         RequestObject response = new RequestObject();
@@ -38,6 +50,12 @@ public class RequestHandler {
         return response;
     }
 
+    /**
+     * Handles a LIST request
+     * @param request Request from the client
+     * @param dbcon Database connection for the client
+     * @return Response to send to the client
+     */
     private static RequestObject handleList(RequestObject request, Database dbcon) {
         RequestObject response = new RequestObject();
         response.put("response", "LIST");
@@ -52,6 +70,12 @@ public class RequestHandler {
         return response;
     }
 
+    /**
+     * Handles a CREATE request
+     * @param request Request from the client
+     * @param dbcon Database connection for the client
+     * @return Response to send to the client
+     */
     private static RequestObject handleCreate(RequestObject request, Database dbcon) {
         RequestObject response = new RequestObject();
         response.put("response", "CREATE");

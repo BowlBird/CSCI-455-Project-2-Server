@@ -2,6 +2,11 @@ package csci.project.server;
 
 public class RequestParser {
 
+    /**
+     * Parses a RequestObject from a request string sent from a client
+     * @param request Request string sent from the client
+     * @return RequestObject generated from parsing the request string
+     */
     public static RequestObject parse(String request) {
         RequestObject result = new RequestObject();
         String[] lines = request.split("\n");
