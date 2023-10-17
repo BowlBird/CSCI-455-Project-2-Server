@@ -18,9 +18,6 @@ public class RequestHandler {
             case "CREATE":
                 response = handleCreate(request, dbcon);
                 break;
-            case "BALANCE":
-                response = handleBalance(request, dbcon);
-                break;
             default:
                 response = new RequestObject();
                 break;
@@ -72,15 +69,6 @@ public class RequestHandler {
         } catch (Exception e) {
             return response;
         }
-    }
-
-    private static RequestObject handleBalance(RequestObject request, Database dbcon) {
-        RequestObject response = new RequestObject();
-        response.put("response", "BALANCE");
-        response.put("balance", 0.0);
-        Optional<Event> event = dbcon.getEvent(request.getAsInt("id"));
-        event.ifPresent(e -> response.put("balance", e.balance()));
-        return response;
     }
 
 }
