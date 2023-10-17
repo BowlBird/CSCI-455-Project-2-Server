@@ -31,4 +31,4 @@ Clone the repo and run `gradle build` in the project's base directory.
 
 - [JDK 17+](https://www.oracle.com/java/technologies/downloads/#java17)
 
-Download the jar file in the releases tab and run it with `java -jar [name of jar file]`
+Download the jar file in the releases tab and run it with `java -jar server.jar`.
