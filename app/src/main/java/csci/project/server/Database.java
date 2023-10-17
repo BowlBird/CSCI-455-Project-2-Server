@@ -16,25 +16,28 @@ public class Database {
 
     private static final ReentrantLock lock = new ReentrantLock();
     private final HttpClient client;
-    private int nextId;
 
     public Database() {
         this.client = HttpClient.newHttpClient();
-        this.nextId = getNextId();
     }
 
-    private int getNextId() {
-        HttpRequest request = HttpRequest.newBuilder()
+    private int getAndIncrementNextId() {
+        HttpRequest getRequest = HttpRequest.newBuilder()
                 .uri(buildURI("nextId"))
                 .GET()
                 .build();
         lock.lock();
-        int result = client.sendAsync(request, BodyHandlers.ofString())
+        int id = client.sendAsync(getRequest, BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .thenApply(Integer::parseInt)
                 .join();
+        HttpRequest incrementRequest = HttpRequest.newBuilder()
+                .uri(buildURI("nextId"))
+                .PUT(BodyPublishers.ofString("" + (id + 1)))
+                .build();
+        client.sendAsync(incrementRequest, BodyHandlers.ofString()).join();
         lock.unlock();
-        return result;
+        return id;
     }
 
     public void putEvent(Event event) {
@@ -49,7 +52,7 @@ public class Database {
     }
 
     public int createEvent(PartialEvent partialEvent) {
-        int id = nextId++;
+        int id = getAndIncrementNextId();
         Event event = partialEvent.addId(id);
         putEvent(event);
         return id;
