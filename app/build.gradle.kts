@@ -5,6 +5,12 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/8.3/userguide/building_java_projects.html in the Gradle documentation.
  */
 
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = "csci.project.server.App"
+    }
+}
+
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
