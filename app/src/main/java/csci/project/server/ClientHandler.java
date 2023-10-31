@@ -1,58 +1,37 @@
 package csci.project.server;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.util.function.BooleanSupplier;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 
 public class ClientHandler implements Runnable {
 
-    private final ObjectOutputStream outputStream;
-    private final ObjectInputStream inputStream;
-    private final BooleanSupplier isConnected;
-    private final Runnable closeConnection;
+    private final InetSocketAddress returnAddress;
+    private final RequestObject request;
     private final Database dbcon;
 
     /**
      * The ClientHandler handles a single client's requests and responses
      * @param connection The socket connection with the client
      */
-    public ClientHandler(Socket connection) throws IOException {
-        this.outputStream = new ObjectOutputStream(connection.getOutputStream());
-        this.outputStream.flush();
-        this.inputStream = new ObjectInputStream(connection.getInputStream());
-        this.isConnected = () -> connection.isConnected() || connection.isInputShutdown()
-                || connection.isOutputShutdown();
-        this.closeConnection = () -> {
-            try {
-                connection.close();
-            } catch (Exception e) {
-            }
-        };
+    public ClientHandler(InetSocketAddress returnAddress, RequestObject request) throws IOException {
+        this.returnAddress = returnAddress;
+        this.request = request;
         this.dbcon = new Database();
     }
 
     @Override
     public void run() {
         try {
-            while (this.isConnected.getAsBoolean()) {
-                RequestObject request = RequestParser.parse((String) inputStream.readObject()); // Get the client request
-                System.out.printf("HEARD\n%s\n", request.toString());
-                RequestObject response = RequestHandler.handle(request, dbcon); // Handle the client request and get the response
-                System.out.printf("SENDING\n%s\n", response.toString());
-                outputStream.writeObject(response.toString()); // Send the response
-                outputStream.flush();
-            } // Continue until the client disconnects or an error occurs
-        } catch (EOFException e) {
-        } catch (ClassNotFoundException e) {
-        } catch (IOException e) {
-        } finally {
-            // Close the connection when the client disconnects or when an error occurs
-            System.out.println("Closing the connection");
-            this.closeConnection.run();
-        }
+            RequestObject response = RequestHandler.handle(this.request, this.dbcon);
+            System.out.println("HEARD:\n" + this.request.toString());
+            System.out.println("SENDING:\n" + response.toString());
+            DatagramPacket packet = new DatagramPacket(response.toString().getBytes(), response.toString().length(), this.returnAddress);
+            DatagramSocket socket = new DatagramSocket();
+            socket.send(packet);
+            socket.close();
+        } catch (Exception e) {}
     }
 
 }

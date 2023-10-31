@@ -4,17 +4,22 @@
 package csci.project.server;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 
 public class App {
     public static void main(String[] args) throws IOException, Exception {
-        ServerSocket serverSocket = new ServerSocket(50000); // Open ServerSocket on port 50000
-
+        DatagramSocket socket = new DatagramSocket(50000);
         while (true) {
-            Socket connection = serverSocket.accept();
-            System.out.println("Connected");
-            new Thread(new ClientHandler(connection)).start();
-        } // Accept any new clients and start a ClientHandler on a new Thread
+            byte[] buf = new byte[1024];
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            socket.receive(packet);
+            
+            String received = new String(buf, 0, buf.length).trim();
+            InetSocketAddress returnAddress = new InetSocketAddress(packet.getAddress(), packet.getPort());
+            Thread clientHandler = new Thread(new ClientHandler(returnAddress, RequestParser.parse(received)));
+            clientHandler.start();
+        }
     }
 }
