@@ -1,6 +1,6 @@
-# CSCI-455-Project-1-Server
+# CSCI-455-Project-2-Server
 
-This is the server for CSCI-455: Networking and Parallel Computation project 1.
+This is the server for CSCI-455: Networking and Parallel Computation project 2.
 
 ## Authors
 
@@ -14,8 +14,6 @@ The server manages the connections to the Firebase realtime database and handles
 
 The server writes logs in the terminal. When a new client connects, you will see `Connected`. When a client disconnects, you will see `Closing the connection`. When the server sees a request, it will print out `HEARD` followed by the message on the next line(s). When the server is sending a response, it will print out `SENDING` followed by the message on the next line(s).
 
-
-
 ## Building and Running from Source
 
 ### Requirements
@@ -24,11 +22,3 @@ The server writes logs in the terminal. When a new client connects, you will see
 - [Gradle](https://gradle.org/install/)
 
 Clone the repo and run `gradle build` in the project's base directory.
-
-## Running from Release
-
-### Requirements
-
-- [JDK 17+](https://www.oracle.com/java/technologies/downloads/#java17)
-
-Download the jar file in the releases tab and run it with `java -jar server.jar`.
